@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from tqdm import tqdm
 from torch.utils.data import DataLoader, random_split
 from back.SBGM.sbgm_fct import diffusion_coeff_fn, loss_fn, marginal_prob_std_fn
 from back.SBGM.sampler import Euler_Maruyama_sampler
@@ -18,6 +19,7 @@ from back.VAE.VAE import VariationalAutoencoder
 from back.utils.utils import piano_roll_to_pretty_midi, threshold
 import zipfile
 import argparse
+from base64 import b64encode
 
 def generate(composer, n_output):
     ####### IMPORT PARAMETERS FROM CONFIG GILE
@@ -37,6 +39,7 @@ def generate(composer, n_output):
 
     ######### IMPORT DATA
     csv_path = f"{data_output_path}{composer}_encoded"
+    print(csv_path)
     if not os.path.exists(f"{csv_path}.zip"):
         
         path_to_midi = f"{data_midi_path}{composer}/"
@@ -75,7 +78,7 @@ def generate(composer, n_output):
     transform = BarTransform(split=notesperbar,
                             bars=totalbars, 
                             note_count=NUM_PITCHES)
-    midi_dataset = MidiDataset(csv_file=csv_path, 
+    midi_dataset = MidiDataset(csv_file=f"{csv_path}.csv", 
                             transform = transform, 
                             midi_start = 0,
                             midi_end = NUM_PITCHES - 1,
@@ -94,7 +97,7 @@ def generate(composer, n_output):
 
 
     #######VARIATIONNAL AUTOENCODE DATA
-    path_to_VAE_pretrained_model = f'{composer}VAE.pt'
+    path_to_VAE_pretrained_model = f'{composer}_VAE.pt'
     latent_features_VAE= d_vae["latent_features_VAE"]
     enc_hidden_size_VAE= d_vae["enc_hidden_size_VAE"]
     decoders_initial_size_VAE = d_vae["decoders_initial_size_VAE"]
@@ -140,7 +143,7 @@ def generate(composer, n_output):
                                 num_workers=num_workers, 
                                 drop_last=True)
 
-        optimizer = Adam(vae.parameters(), lr=lr)
+        optimizer = Adam(vae.parameters(), lr=lr_VAE)
         train_loss, train_kl, train_klw, valid_loss, valid_kl = vae.train_VAE(optimizer, 
                                                                                 train_loader, 
                                                                                 test_loader,
@@ -206,16 +209,21 @@ def generate(composer, n_output):
     l_out_midi_generated = [threshold(notes_gen[0,:,:].detach().cpu().numpy()) for notes_gen in l_notes_gen]
 
     ###### SAVE TO MIDI
-    l_final = []
-    for i,out in tqdm(enumerate(l_out_midi_generated)): 
-        l_final.append(piano_roll_to_pretty_midi(
+
+    for i,out in enumerate(l_out_midi_generated): 
+        piano_roll_to_pretty_midi(
             out[:,:-1],
-            fs=fs,
+            fs=8,
             to_mid = True, 
             filename = f"{data_midi_path}Final_generated_music/{composer}_{i}.mid"
-            ))
+            )
+    l_final = []
+    for i in range(n_output):
+        mp4 = open(f'{data_midi_path}Final_generated_music/{composer}_{i}.mid','rb').read()
+        l_final.append("data:video/mp4;base64," + b64encode(mp4).decode())
 
     return l_final
+
 
 if __name__ == "__main__":
 
