@@ -17,6 +17,7 @@ from back.MidiFile.midi_file import MidiFileParser
 from back.VAE.VAE import VariationalAutoencoder
 from back.utils.utils import piano_roll_to_pretty_midi, threshold
 from main_inputs import composer, n_output
+import zipfile
 
 ####### IMPORT PARAMETERS FROM CONFIG GILE
 notesperbar = d["notesperbar"]
@@ -34,8 +35,8 @@ cuda = torch.cuda.is_available()
 device = torch.device("cuda" if cuda else "cpu")
 
 ######### IMPORT DATA
-csv_path = f"{data_output_path}{composer}_encoded.csv"
-if not os.path.exists(csv_path):
+csv_path = f"{data_output_path}{composer}_encoded"
+if not os.path.exists(f"{csv_path}.zip"):
     
     path_to_midi = f"{data_midi_path}{composer}/"
     logging_ = d_encoding["logging_"]
@@ -60,7 +61,10 @@ if not os.path.exists(csv_path):
                         cutster_, 
                         padster_)
 else: 
-    df = pd.read_csv(csv_path, sep =';')
+    with zipfile.ZipFile(f"{csv_path}.zip","r") as zip_ref:
+        zip_ref.extractall(data_output_path)
+    
+df = pd.read_csv(f"{csv_path}.csv", sep =';')
 
 #######LOAD DATA
 NUM_PITCHES= df.shape[1] - 2 + 1 
