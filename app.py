@@ -13,14 +13,14 @@ def home():
 @app.route('/predict',methods=['POST'])
 def predict():
     composer, n_output = [x for x in request.form.values()]
-    n_output = int(n_output)
+    n_output = 4
     l_out_midi = generate(composer, n_output)
     return render_template(
         'generated.html',
         gen1 = l_out_midi[0],
         gen2 = l_out_midi[1],
         gen3 = l_out_midi[2],
-        gen4 = l_out_midi[4])
+        gen4 = l_out_midi[3])
     
 
 # @app.route('/predict_api',methods=['POST'])
