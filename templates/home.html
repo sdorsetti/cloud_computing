@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Botositor</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='./style.css') }}">
+<script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.22.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
+</head>
+<body>
+ <div class="login">
+	<h1>MUSIC GENERATOR</h1>
+     <!-- Form to enter new data for predictions  -->
+     <form action="{{ url_for('predict')}}"method="POST">
+      <input type="text" name="composer" placeholder="Write your favorite composer's name" required="required" /><br>
+      <input type="text" name="n_output" placeholder="How many songs do you wanna play ?" required="required" /><br>
+      <button type="submit" class="btn btn-primary btn-block btn-large">Let's Generate some good music</button>
+
+      </form>
+
+   <br>
+   <br>
+   
+</div>
+</body>
+</html>

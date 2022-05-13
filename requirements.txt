@@ -1,0 +1,13 @@
+Flask==1.1.4
+ipython==8.3.0
+librosa==0.9.1
+matplotlib==3.3.4
+music21==7.3.1
+numpy==1.20.1
+pandas==1.2.4
+pretty_midi==0.2.9
+tqdm==4.59.0
+Jinja2==2.11.3
+MarkupSafe==2.0.1
+SoundFile==0.10.3.post1
+torch==1.8.1
