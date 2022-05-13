@@ -15,7 +15,7 @@ RUN pip3 install -r requirements.txt
 
 
 # Expose port 
-# EXPOSE 8000
+EXPOSE 8000
 
 COPY . .
 
